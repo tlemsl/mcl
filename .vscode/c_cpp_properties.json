@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/include/eigen3",
+                "/opt/ros/noetic/include",
+                "/workspace/onnxruntime-linux-x64-gpu-1.20.0/include",
+                "/usr/local/cuda-12.5/targets/x86_64-linux/include",
+                "/usr/local/include/pcl-1.14",
+                "/usr/local/include/sophus"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c17",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}

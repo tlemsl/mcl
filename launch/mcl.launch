@@ -1,0 +1,39 @@
+<launch>
+    <!-- Map server -->
+    <arg name="map_file" default="/workspace/datas/maps/2D/map.pgm.yaml"/>
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)"/>
+
+    <!-- MCL node -->
+    <node pkg="mcl" type="mcl_node" name="mcl_node" output="screen" launch-prefix="gdb -ex run --args">
+        <!-- Particle filter parameters -->
+        <param name="num_particles" value="250"/>
+        
+        <!-- Motion model noise parameters -->
+        <param name="motion_noise/x" value="0.05"/>     <!-- std dev in meters -->
+        <param name="motion_noise/y" value="0.05"/>     <!-- std dev in meters -->
+        <param name="motion_noise/theta" value="0.03"/> <!-- std dev in radians -->
+        
+        <!-- Measurement model parameters -->
+        <param name="beam_skip" value="10"/>            <!-- Process every Nth beam -->
+        <param name="likelihood/hit" value="0.9"/>      <!-- Probability for hitting occupied cell -->
+        <param name="likelihood/miss" value="0.1"/>     <!-- Probability for hitting free cell -->
+        
+        <!-- Update parameters -->
+        <param name="update_rate" value="20.0"/>        <!-- Hz -->
+        <param name="resample_interval" value="10"/>    <!-- Resample every N updates -->
+        
+        <!-- TF frames -->
+        <param name="base_frame" value="base_link"/>
+        <param name="odom_frame" value="odom"/>
+        <param name="map_frame" value="map"/>
+        
+        <!-- Topics -->
+        <remap from="scan" to="/scan"/>
+        <remap from="map" to="/map"/>
+        <remap from="mcl_pose" to="/mcl_pose"/>
+    </node>
+
+    <!-- Optional: RViz for visualization -->
+    <node pkg="rviz" type="rviz" name="rviz" 
+          args="-d $(find mcl)/rviz/mcl.rviz"/>
+</launch> 
