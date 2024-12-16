@@ -4,7 +4,7 @@
     <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)"/>
 
     <!-- MCL node -->
-    <node pkg="mcl" type="mcl_node" name="mcl_node" output="screen" launch-prefix="gdb -ex run --args">
+    <node pkg="mcl" type="mcl_node" name="mcl_node" output="screen">
         <!-- Particle filter parameters -->
         <param name="num_particles" value="250"/>
         
