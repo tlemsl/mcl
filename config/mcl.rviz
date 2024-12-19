@@ -6,7 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /Map1
+        - /TF1/Frames1
       Splitter Ratio: 0.5
     Tree Height: 752
   - Class: rviz/Selection
@@ -99,17 +99,17 @@ Visualization Manager:
       Filter (whitelist): ""
       Frame Timeout: 15
       Frames:
-        All Enabled: true
+        All Enabled: false
         base_link:
           Value: true
         laser:
-          Value: true
+          Value: false
         map:
           Value: true
         odom:
           Value: true
         vectornav:
-          Value: true
+          Value: false
       Marker Alpha: 1
       Marker Scale: 1
       Name: TF
@@ -199,7 +199,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 21.300918579101562
+      Distance: 12.682853698730469
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -207,9 +207,9 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -6.834067344665527
-        Y: 16.352214813232422
-        Z: -6.546786785125732
+        X: -5.572232246398926
+        Y: 12.644722938537598
+        Z: -5.566122055053711
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false

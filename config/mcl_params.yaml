@@ -1,0 +1,31 @@
+# Core MCL parameters
+particle_filter:
+  num_particles: 250
+  
+motion_model:
+  noise:
+    x: 0.05
+    y: 0.05
+    theta: 0.03
+    
+measurement_model:
+  beam_skip: 10
+  likelihood:
+    hit: 0.99
+    miss: 0.01 
+
+# ROS wrapper specific parameters
+ros_wrapper:
+  frames:
+    base: "base_link"
+    odom: "odom"
+    map: "map"
+  
+  topics:
+    scan: "/scan"
+    map: "/map"
+    odom: "/odometry/filtered"
+    pose: "/mcl_pose"
+    particles: "/particle_poses"
+    initial_pose: "/initialpose"
+  

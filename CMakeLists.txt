@@ -1,94 +1,75 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(mcl)
 
-# Set C++ standard and optimization flags
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -ggdb -Wall -Wextra")
+# Add core library
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/core 
+                 ${CMAKE_CURRENT_BINARY_DIR}/core)
 
-# Find required packages
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  tf2
-  tf2_ros
-  tf2_eigen
-  sensor_msgs
-  nav_msgs
-  geometry_msgs
-)
-
-find_package(PCL REQUIRED)
-find_package(Eigen3 REQUIRED)
-find_package(Sophus REQUIRED)
-
-# Catkin package settings
-catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES ${PROJECT_NAME}
-  CATKIN_DEPENDS
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native")
+# ROS1 wrapper (conditional)
+if("$ENV{ROS_VERSION}" STREQUAL "1")
+  find_package(catkin REQUIRED COMPONENTS
     roscpp
-    tf2
-    tf2_ros
-    tf2_eigen
     sensor_msgs
     nav_msgs
     geometry_msgs
-  DEPENDS
-    PCL
-    EIGEN3
-)
+    tf2
+    tf2_ros
+    pcl_ros
+  )
 
-# Include directories
-include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-  ${PCL_INCLUDE_DIRS}
-  ${EIGEN3_INCLUDE_DIRS}
-)
+  # Find other dependencies
+  find_package(Eigen3 REQUIRED)
+  find_package(Sophus REQUIRED)
+  find_package(yaml-cpp REQUIRED)
 
-# Library settings
-add_library(${PROJECT_NAME}
-  src/mcl.cpp
-)
+  catkin_package(
+    INCLUDE_DIRS
+      include
+      core/include
+    LIBRARIES
+      mcl_ros1
+      mcl_core
+    CATKIN_DEPENDS 
+      roscpp 
+      sensor_msgs 
+      nav_msgs 
+      geometry_msgs 
+      tf2 
+      tf2_ros
+  )
 
-target_link_libraries(${PROJECT_NAME}
-  ${catkin_LIBRARIES}
-  ${PCL_LIBRARIES}
-)
+  # Include directories
+  include_directories(
+    ros1_wrapper/include
+    core/include
+    ${catkin_INCLUDE_DIRS}
+    ${EIGEN3_INCLUDE_DIRS}
+    ${Sophus_INCLUDE_DIRS}
+    ${YAML_CPP_INCLUDE_DIR}
+  )
 
-# Executable settings
-add_executable(${PROJECT_NAME}_node src/mcl_node.cpp)
+  add_library(mcl_ros1
+    ros1_wrapper/src/mcl_ros1_wrapper.cpp
+  )
 
-target_link_libraries(${PROJECT_NAME}_node
-  ${PROJECT_NAME}
-  ${catkin_LIBRARIES}
-)
+  target_link_libraries(mcl_ros1
+    mcl_core
+    ${catkin_LIBRARIES}
+    yaml-cpp
+  )
 
-# Installation
-install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+  add_executable(mcl_ros1_node
+    ros1_wrapper/src/mcl_ros1_node.cpp
+  )
 
-install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.h"
-  PATTERN ".svn" EXCLUDE
-)
+  target_link_libraries(mcl_ros1_node
+    mcl_ros1
+    ${catkin_LIBRARIES}
+  )
+endif()
 
-install(DIRECTORY launch/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
-  FILES_MATCHING PATTERN "*.launch"
-)
-
-install(DIRECTORY rviz/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/rviz
-  FILES_MATCHING PATTERN "*.rviz"
-)
-
-install(DIRECTORY maps/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/maps
-  FILES_MATCHING PATTERN "*.yaml" PATTERN "*.pgm"
-)
+# ROS2 wrapper (future implementation)
+if("$ENV{ROS_VERSION}" STREQUAL "2")
+  message(ERROR "ROS2 wrapper is not implemented yet")
+endif()
