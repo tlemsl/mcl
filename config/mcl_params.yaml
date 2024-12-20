@@ -11,8 +11,8 @@ motion_model:
 measurement_model:
   beam_skip: 10
   likelihood:
-    hit: 0.99
-    miss: 0.01 
+    hit: 0.9
+    miss: 0.1 
 
 # ROS wrapper specific parameters
 ros_wrapper:

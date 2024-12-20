@@ -33,4 +33,19 @@ SE2Type MotionModel::Sample(const SE2Type& current_pose,
   return current_pose * noisy_delta;
 }
 
+SE2Type MotionModel::AddSmallNoise(const SE2Type& pose, std::mt19937& gen) const {
+  // Add small noise to prevent particle depletion
+  std::normal_distribution<double> noise_x(0, noise_x_);
+  std::normal_distribution<double> noise_y(0, noise_y_);
+  std::normal_distribution<double> noise_theta(0, noise_theta_);
+
+  Vector2Type noisy_trans(
+      pose.translation().x() + noise_x(gen),
+      pose.translation().y() + noise_y(gen)
+  );
+  double noisy_theta = pose.so2().log() + noise_theta(gen);
+
+  return SE2Type(Sophus::SO2d(noisy_theta), noisy_trans);
+}
+
 }  // namespace mcl

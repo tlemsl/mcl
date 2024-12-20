@@ -85,23 +85,50 @@ void ParticleFilter::Update(const std::vector<double>& ranges, double angle_min,
 }
 
 void ParticleFilter::Resample() {
-  std::vector<double> cumsum(particles_.size());
-  cumsum[0] = particles_[0].weight;
 
-  for (size_t i = 1; i < particles_.size(); ++i) {
-    cumsum[i] = cumsum[i - 1] + particles_[i].weight;
+    
+  std::vector<Particle> new_particles;
+  new_particles.reserve(num_particles_);  // Pre-allocate memory
+  
+  // Calculate cumulative weights
+  std::vector<double> cumulative_weights(num_particles_);
+  cumulative_weights[0] = particles_[0].weight;
+  
+  for (int i = 1; i < num_particles_; i++) {
+      cumulative_weights[i] = cumulative_weights[i-1] + particles_[i].weight;
   }
-
-  Particles new_particles;
-  new_particles.reserve(num_particles_);
-
-  std::uniform_int_distribution<int> dist(0, num_particles_ - 1);
-
-  for (int i = 0; i < num_particles_; ++i) {
-    new_particles.emplace_back(particles_[dist(gen_)].pose,
-                               1.0 / num_particles_);
+  
+  // Normalize cumulative weights
+  double total_weight = cumulative_weights.back();
+  if (total_weight <= 0) {
+      return;
   }
-
+  
+  // Low variance resampler
+  std::uniform_real_distribution<double> dist(0.0, 1.0/num_particles_);
+  double r = dist(gen_);
+  int current_idx = 0;
+  
+  for (int i = 0; i < num_particles_; i++) {
+      double u = r + i * (1.0/num_particles_);
+      
+      while (u > (cumulative_weights[current_idx] / total_weight) && 
+              current_idx < num_particles_ - 1) {
+          current_idx++;
+      }
+      
+      Particle new_particle;
+      // std::cout << "current_idx: " << current_idx << std::endl;
+      new_particle.pose = particles_[current_idx].pose;
+      new_particle.weight = 1.0/num_particles_;
+      new_particles.push_back(std::move(new_particle));
+  }
+  
+  for (auto& particle : new_particles) {
+    // Add small noise to prevent particle depletion
+    particle.pose = motion_model_->AddSmallNoise(particle.pose, gen_);
+  }
+  
   particles_ = std::move(new_particles);
 }
 

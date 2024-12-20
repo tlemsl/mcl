@@ -16,6 +16,9 @@ class MotionModel {
                  const SE2Type& odometry_delta,
                  std::mt19937& gen) const;
                  
+  // Add small noise to prevent particle depletion
+  SE2Type AddSmallNoise(const SE2Type& pose, std::mt19937& gen) const;
+
  private:
   // Motion noise parameters
   double noise_x_;
