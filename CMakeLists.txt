@@ -5,7 +5,7 @@ project(mcl)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/core 
                  ${CMAKE_CURRENT_BINARY_DIR}/core)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native -fPIC")
 # ROS1 wrapper (conditional)
 if("$ENV{ROS_VERSION}" STREQUAL "1")
   find_package(catkin REQUIRED COMPONENTS
